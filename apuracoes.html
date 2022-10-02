@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(0, 0, 0, .7);
+        }
+
+        .overlay__wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .overlay__spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        var url = "https://resultados.tse.jus.br/oficial/ele2022/544/dados-simplificados/br/br-c0001-e000544-r.json";
+        var candidatos = [];
+
+        var img = {
+            '12': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/882713/foto.jpg',
+            '13': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/893498/foto.jpg',
+            '14': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/920502/foto.jpeg',
+            '15': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/899992/foto.jpg',
+            '16': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/898012/foto.jpg',
+            '21': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/890829/foto.jpeg',
+            '22': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/908966/foto.jpeg',
+            '27': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/914331/foto.jpeg',
+            '30': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/892517/foto.jpg',
+            '44': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/913738/foto.jpg',
+            '80': 'https://divulgacandcontas.tse.jus.br/candidaturas/oficial/2022/BR/BR/544/candidatos/884623/foto.jpg'
+        };
+
+        function obterApuracoes() {
+            $.get(url, function (data, status) {
+                candidatos = data.cand;
+
+                limparTela();
+                adicionarPstGeral(data.pst)
+                popularLista();
+            });
+        }
+
+        function limparTela() {
+            $("#pstGeral").empty();
+            $("#lista").empty();
+        }
+
+        function adicionarCard(posicao, nome, numero, porcentagem, partido) {
+
+            porcentagem = porcentagem.replace(",", ".");
+
+            $("#lista").append(`
+            <div class="col-11 col-sm-5 col-md-3 col-lg-2 d-flex align-items-stretch m-2">
+                <div class="card h-100 w-100">
+                    <img src="${img[numero]}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                                ${posicao}
+                            </span>
+                            ${nome}
+                        </h5>
+                        <h5>${numero}</h5>
+
+                        <p class="card-text">
+                            ${partido}
+                        </p>
+                        <div class="progress ">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${porcentagem}%;"></div>
+                        </div>
+                            <div style="color:black">${porcentagem}%</div>
+                    </div>
+                </div>
+            </div>
+            `);
+        }
+
+        function adicionarPstGeral(pstGeral) {
+            pstGeral = pstGeral.replace(",", ".");
+            $("#pstGeral").append(`
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${pstGeral}%;">${pstGeral}%</div>
+            </div>
+            `);
+        }
+
+        function popularLista() {
+            candidatos.forEach(x => {
+                adicionarCard(x.seq, x.nm, x.n, x.pvap, x.cc.split("-")[0]);
+            });
+        }
+
+
+        $(document).ready(function () {
+            obterApuracoes();
+
+            var $loading = $('#load').hide();
+            $(document)
+                .ajaxStart(function () {
+                    $loading.show();
+                })
+                .ajaxStop(function () {
+                    $loading.hide();
+                });
+
+            setInterval(function () {
+                obterApuracoes();
+            }, 5000);
+
+            $("#teste").click(function () {
+                adicionarCard();
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <button id="teste" hidden>teste</button>
+
+    <div class="container mt-2">
+        <div class="row">
+            Apuração total<br>
+            <div id="pstGeral" class="col mb-2">
+
+            </div>
+        </div>
+        <div id="lista" class="row">
+            <div class="col" hidden>
+                <div class="card h-100">
+                    <img src="..." class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                99+
+                            </span>
+                            nome | 22
+                        </h5>
+
+                        <p class="card-text">
+                            Some quick example text to build on the card title and make up the bulk of
+                            the card's content.
+                        </p>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 30%;">25%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="load">
+        <div class="overlay">
+            <div class="overlay__wrapper">
+                <div class="overlay__spinner">
+
+                    <div class="spinner-border text-primary" id="spinner" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
