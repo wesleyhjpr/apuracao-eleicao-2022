@@ -33,7 +33,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-        var url = "https://resultados.tse.jus.br/oficial/ele2022/544/dados-simplificados/br/br-c0001-e000544-r.json";
+        var urlPrimeiroTurno = "https://resultados.tse.jus.br/oficial/ele2022/544/dados-simplificados/br/br-c0001-e000544-r.json";
+        var urlSegundoTurno = "https://resultados.tse.jus.br/oficial/ele2022/545/dados-simplificados/br/br-c0001-e000545-r.json";
         var candidatos = [];
 
         var img = {
@@ -51,7 +52,7 @@
         };
 
         function obterApuracoes() {
-            $.get(url, function (data, status) {
+            $.get(urlSegundoTurno, function (data, status) {
                 candidatos = data.cand;
 
                 limparTela();
